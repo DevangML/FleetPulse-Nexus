@@ -1,49 +1,53 @@
-import React, { useState } from 'react';
-import { useDebounce } from '../../hooks/useDebounce.js';
+import React, { useState, useEffect } from 'react';
+
+// MOCK API: Fleet Database Search Endpoint
+const MOCK_ASSET_API = "https://jsonplaceholder.typicode.com/users";
 
 export function VehicleDirectory() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [results, setResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const debouncedSearch = useDebounce(searchTerm, 300);
+  const [query, setQuery] = useState('');
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
-  // Mettl TODO: Fetch logic goes here tracking `debouncedSearch`
-  // Make sure to set `isLoading` to true while fetching, and false when done.
-
+  // METTL TODO: Implement the debounce logic here (500ms delay before fetching).
+  // CRITICAL: Ensure you clear the timer on every keystroke to prevent network leaks.
+  
   return (
     <div className="card stack">
-      <h2>📁 Asset Directory</h2>
-      {/* 
-        METTL TODO 1: Attach an onChange to this input to update `searchTerm`.
-        METTL TODO 2: Ensure the input retains `id="search-box"` for automated grading!
-      */}
+      <h2>📁 Asset Directory (Debounced Auto-Filter Grid)</h2>
+      
+      {/* REQUIRED ID: search-input */}
       <input 
         type="text" 
-        id="search-box"
-        placeholder="Search vehicle ID or type..." 
+        id="search-input"
+        placeholder="Filter system records..." 
         className="input"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
 
-      {/* 
-        METTL TODO 3: Render a loading state (e.g. <div id="loading-spinner">) when searching.
-        METTL TODO 4: Map the `results` array into DOM nodes.
-        CRITICAL: Use strict boolean evaluation (results.length > 0) to avoid rendering '0' in the DOM if empty!
-      */}
+      {/* CONDITIONAL RENDER: Safe boolean check avoids rendering '0' strings */}
+      {loading && <div id="loading-indicator">Synchronizing records...</div>}
+      {apiError && <div id="error-display" style={{ color: 'var(--accent-red)' }}>{apiError}</div>}
       
-      {isLoading && <div id="loading-spinner">Searching...</div>}
-      
-      {results.length > 0 && (
-        <ul id="results-list">
-          {/* Map your results here */}
+      {/* REQUIRED ID: results-grid */}
+      {records.length > 0 && (
+        <ul id="results-grid">
+          {/* Map your results here. Don't forget the unique key! */}
         </ul>
       )}
       
-      {/* Fallback instruction block if not implemented */}
-      {results.length === 0 && !isLoading && (
+      {/* EDGE CASE: Array is empty and user isn't waiting for a fetch response */}
+      {!loading && query.trim() && records.length === 0 && (
+        <div id="empty-state" style={{ color: 'var(--text-muted)' }}>
+          No matching asset logs found.
+        </div>
+      )}
+
+      {/* Sandbox placeholder (remove when coding) */}
+      {!loading && records.length === 0 && !query.trim() && (
         <div style={{ color: 'var(--text-muted)' }}>
-          Awaiting your implementation for the Mettl Async Search Challenge...
+          Awaiting debounced fetch implementation...
         </div>
       )}
     </div>
