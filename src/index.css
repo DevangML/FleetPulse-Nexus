@@ -1,0 +1,336 @@
+@layer reset, theme, base, components, utilities, animations;
+
+@layer theme {
+  :root {
+    /* Baseline sRGB Color Space */
+    --bg-space: #030712;
+    --bg-base: #080d1a;
+    --bg-surface: #0f172a;
+    --bg-surface-raised: #1e293b;
+    --bg-glass: rgba(15, 23, 42, 0.75);
+
+    --border-subtle: rgba(148, 163, 184, 0.08);
+    --border-accent: rgba(148, 163, 184, 0.22);
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* Semantic Status Accents */
+    --accent-cyan: #00f5d4;
+    --accent-green: #10b981;
+    --accent-gold: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-purple: #a855f7;
+
+    /* Volumetric Dual-Layer Glow Tokens */
+    --glow-cyan: 0 0 20px rgba(0, 245, 212, 0.3), 0 0 40px rgba(0, 245, 212, 0.1);
+    --glow-green: 0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.1);
+    --glow-red: 0 0 24px rgba(239, 68, 68, 0.35), 0 0 50px rgba(239, 68, 68, 0.15);
+    --glow-gold: 0 0 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.1);
+
+    /* Accessible Typography & Metrics */
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+    --font-mono: ui-monospace, 'Fira Code', 'SF Mono', Menlo, monospace;
+
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+
+    /* Ergonomic Micro-interaction Curves */
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+
+    color-scheme: dark;
+  }
+
+  /* Wide Gamut DCI-P3 Color Gamut Calibration */
+  @supports (color: color(display-p3 0 0 0)) {
+    :root {
+      --bg-space: color(display-p3 0.012 0.018 0.032);
+      --bg-base: color(display-p3 0.028 0.042 0.072);
+      --bg-surface: color(display-p3 0.055 0.082 0.145);
+      --bg-surface-raised: color(display-p3 0.092 0.132 0.218);
+      --bg-glass: color(display-p3 0.055 0.082 0.145 / 0.75);
+
+      --accent-cyan: color(display-p3 0 0.96 0.83);
+      --accent-green: color(display-p3 0.15 0.88 0.52);
+      --accent-gold: color(display-p3 1 0.76 0.12);
+      --accent-red: color(display-p3 1 0.22 0.25);
+      --accent-purple: color(display-p3 0.65 0.32 0.98);
+
+      --glow-cyan: 0 0 24px color(display-p3 0 0.96 0.83 / 0.35), 0 0 48px color(display-p3 0 0.96 0.83 / 0.12);
+      --glow-green: 0 0 24px color(display-p3 0.15 0.88 0.52 / 0.35), 0 0 48px color(display-p3 0.15 0.88 0.52 / 0.12);
+      --glow-red: 0 0 28px color(display-p3 1 0.22 0.25 / 0.4), 0 0 60px color(display-p3 1 0.22 0.25 / 0.18);
+    }
+  }
+}
+
+@layer reset {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--bg-space);
+    background-image: 
+      /* Subtle Top Ambient Spotlight */
+      radial-gradient(ellipse 90% 50% at 50% -20%, color-mix(in srgb, var(--accent-cyan) 14%, transparent), transparent 70%),
+      /* Deep Purple Nebula Corner Light */
+      radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--accent-purple) 9%, transparent), transparent 60%),
+      /* High-Precision 32px Grid Canvas Mesh */
+      linear-gradient(rgba(148, 163, 184, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    padding: clamp(16px, 3.5vw, 40px);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* Accessible Focus Indicator (WCAG 2.1 AA) */
+  :focus-visible {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent-cyan) 30%, transparent);
+    color: var(--accent-cyan);
+  }
+}
+
+@layer components {
+  /* Studio Glassmorphism Card Container */
+  .card {
+    position: relative;
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid var(--border-subtle);
+    border-top: 1px solid color-mix(in srgb, white 14%, var(--border-subtle));
+    border-radius: var(--radius-md);
+    padding: 22px;
+    box-shadow: 
+      0 12px 32px -8px rgba(0, 0, 0, 0.65),
+      0 4px 8px -2px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: 
+      transform 0.25s var(--ease-smooth),
+      border-color 0.25s var(--ease-smooth),
+      box-shadow 0.25s var(--ease-smooth);
+    contain: content;
+  }
+
+  .card:hover {
+    border-color: var(--border-accent);
+    transform: translateY(-2px);
+    box-shadow: 
+      0 18px 45px -10px rgba(0, 0, 0, 0.75),
+      0 6px 14px -3px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .card-warning {
+    border-color: var(--accent-gold);
+    box-shadow: var(--glow-gold);
+  }
+
+  .card-critical {
+    border-color: var(--accent-red);
+    box-shadow: var(--glow-red);
+    animation: pulse-critical 2.5s infinite ease-in-out;
+  }
+
+  /* Tactile Mission Action Button */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    border: 1px solid var(--border-subtle);
+    border-top: 1px solid color-mix(in srgb, white 12%, var(--border-subtle));
+    background: var(--bg-surface-raised);
+    color: var(--text-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s var(--ease-smooth);
+    user-select: none;
+  }
+
+  .btn:hover {
+    background: color-mix(in srgb, white 6%, var(--bg-surface-raised));
+    border-color: var(--border-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-success {
+    background: color-mix(in srgb, var(--accent-green) 14%, var(--bg-surface));
+    color: var(--accent-green);
+    border-color: color-mix(in srgb, var(--accent-green) 40%, transparent);
+  }
+
+  .btn-success:hover {
+    background: color-mix(in srgb, var(--accent-green) 24%, var(--bg-surface));
+    border-color: var(--accent-green);
+    box-shadow: var(--glow-green);
+  }
+
+  .btn-danger {
+    background: color-mix(in srgb, var(--accent-red) 14%, var(--bg-surface));
+    color: var(--accent-red);
+    border-color: color-mix(in srgb, var(--accent-red) 40%, transparent);
+  }
+
+  .btn-danger:hover {
+    background: color-mix(in srgb, var(--accent-red) 24%, var(--bg-surface));
+    border-color: var(--accent-red);
+    box-shadow: var(--glow-red);
+  }
+
+  /* Diagnostic Cyberpunk HUD Badge */
+  kbd {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--accent-cyan) 12%, var(--bg-space));
+    color: var(--accent-cyan);
+    border: 1px solid color-mix(in srgb, var(--accent-cyan) 35%, transparent);
+    box-shadow: 0 0 10px -2px color-mix(in srgb, var(--accent-cyan) 25%, transparent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Telemetry JSON / Code Stream Terminal */
+  pre {
+    background: var(--bg-space);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    line-height: 1.65;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-accent) transparent;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7);
+  }
+
+  pre::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  pre::-webkit-scrollbar-thumb {
+    background: var(--border-accent);
+    border-radius: 3px;
+  }
+
+  /* Ergonomic Range Slider with Glowing Radial Thumb */
+  input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--bg-surface-raised);
+    height: 6px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-cyan);
+    border: 2px solid var(--bg-space);
+    box-shadow: 0 0 12px var(--accent-cyan);
+    transition: transform 0.15s var(--ease-spring);
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-cyan);
+    border: 2px solid var(--bg-space);
+    box-shadow: 0 0 12px var(--accent-cyan);
+    transition: transform 0.15s var(--ease-spring);
+  }
+}
+
+@layer utilities {
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: 18px;
+  }
+
+  .flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .flex-gap {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
+@layer animations {
+  @keyframes pulse-critical {
+    0%, 100% {
+      border-color: var(--accent-red);
+      box-shadow: var(--glow-red);
+    }
+    50% {
+      border-color: color-mix(in srgb, var(--accent-red) 40%, transparent);
+      box-shadow: 0 0 35px color-mix(in srgb, var(--accent-red) 50%, transparent);
+    }
+  }
+}
